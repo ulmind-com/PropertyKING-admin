@@ -1,0 +1,11 @@
+.admin-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 20px; }
+.login-card { width: 100%; max-width: 400px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 32px; text-align: center; }
+.login-logo { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 22px; color: var(--text); margin-bottom: 32px; }
+.login-logo .logo-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-gradient); border-radius: 10px; color: white; }
+.login-logo b { color: var(--primary); }
+.login-card h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+.login-card > p { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
+.login-card form { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.login-field { position: relative; display: flex; align-items: center; }
+.login-field svg { position: absolute; left: 12px; color: var(--text-muted); }
+.login-field .input { padding-left: 40px; }

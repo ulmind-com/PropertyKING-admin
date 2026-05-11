@@ -1,0 +1,20 @@
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.toolbar-search { display: flex; align-items: center; gap: 10px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 14px; flex: 1; max-width: 320px; }
+.toolbar-search input { border: none; background: transparent; color: var(--text); font-size: 13px; padding: 10px 0; width: 100%; outline: none; }
+.toolbar-search svg { color: var(--text-muted); flex-shrink: 0; }
+.toolbar-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.data-table { padding: 0; overflow-x: auto; }
+.data-table table { width: 100%; border-collapse: collapse; }
+.data-table th { text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); background: var(--bg-elevated); }
+.data-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+.prop-cell { display: flex; align-items: center; gap: 12px; }
+.prop-thumb { width: 56px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+.prop-title { font-weight: 600; font-size: 13px; display: block; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prop-type { font-size: 11px; color: var(--text-muted); text-transform: capitalize; }
+.price-cell { font-weight: 700; color: var(--primary); }
+.lister-name { font-size: 13px; }
+
+.action-btns { display: flex; gap: 6px; }
