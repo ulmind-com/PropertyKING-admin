@@ -31,7 +31,7 @@ export default function AdminLayout() {
     { to: '/properties', icon: <Building2 size={18} />, label: 'Properties' },
     { to: '/review-queue', icon: <CheckCircle size={18} />, label: 'Review Queue' },
     { to: '/property-types', icon: <Layers size={18} />, label: 'Property Types' },
-    { to: '/amenities', icon: <Sparkles size={18} />, label: 'Amenities' },
+    // { to: '/amenities', icon: <Sparkles size={18} />, label: 'Amenities' },
     { to: '/users', icon: <Users size={18} />, label: 'Users' },
     { to: '/inquiries', icon: <MessageSquare size={18} />, label: 'Inquiries' },
     { to: '/notifications', icon: <Bell size={18} />, label: 'Notifications' },
