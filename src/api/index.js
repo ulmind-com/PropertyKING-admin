@@ -25,6 +25,7 @@ export const adminAPI = {
   propertiesCount: (params) => api.get('/admin/properties/count', { params }),
   approveProperty: (id) => api.put(`/admin/properties/${id}/approve`),
   rejectProperty: (id, reason) => api.put(`/admin/properties/${id}/reject`, { reason }),
+  deleteProperty: (id, reason) => api.delete(`/admin/properties/${id}`, { params: { reason } }),
   users: (params) => api.get('/admin/users', { params }),
   toggleUserStatus: (id) => api.put(`/admin/users/${id}/status`),
   toggleAdmin: (id) => api.put(`/admin/users/${id}/toggle-admin`),

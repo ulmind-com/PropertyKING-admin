@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, Heart, MessageSquare } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, Heart, MessageSquare, Trash2 } from 'lucide-react';
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 import Drawer from '../../components/Drawer/Drawer';
@@ -55,6 +55,13 @@ export default function Properties({ reviewMode }) {
     const reason = prompt('Rejection reason (min 10 chars):');
     if (!reason || reason.length < 10) return toast.error('Reason must be at least 10 characters');
     try { await adminAPI.rejectProperty(id, reason); toast.success('Property rejected'); load(); setDrawerOpen(false); } catch(e) { toast.error('Failed to reject'); }
+  };
+
+  const handleDelete = async (id) => {
+    const reason = prompt('Please enter a reason for deletion (This will be emailed to the lister):');
+    if (!reason || reason.length < 10) return toast.error('Reason must be at least 10 characters');
+    if (!window.confirm('Are you sure you want to permanently delete this property?')) return;
+    try { await adminAPI.deleteProperty(id, reason); toast.success('Property deleted permanently'); load(); setDrawerOpen(false); } catch(e) { toast.error('Failed to delete property'); }
   };
 
   const openDrawer = (p) => { setSelected(p); setDrawerOpen(true); };
@@ -120,10 +127,16 @@ export default function Properties({ reviewMode }) {
                   <td style={{fontSize:12,color:'var(--text-muted)'}}>{timeAgo(p.created_at)}</td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="action-btns">
-                      {p.status === 'pending' && <>
-                        <button className="btn btn-sm btn-success" onClick={() => handleApprove(p.id)} title="Approve"><CheckCircle size={14} /></button>
-                        <button className="btn btn-sm btn-danger" onClick={() => handleReject(p.id)} title="Reject"><XCircle size={14} /></button>
-                      </>}
+                      {p.status === 'pending' ? (
+                        <>
+                          <button className="btn btn-sm btn-success" onClick={() => handleApprove(p.id)} title="Approve"><CheckCircle size={14} /></button>
+                          <button className="btn btn-sm btn-danger" onClick={() => handleReject(p.id)} title="Reject"><XCircle size={14} /></button>
+                        </>
+                      ) : (
+                        <button className="btn btn-sm btn-outline" style={{borderColor:'var(--error)',color:'var(--error)'}} onClick={() => handleDelete(p.id)} title="Delete Property">
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -167,10 +180,16 @@ export default function Properties({ reviewMode }) {
               </div>
             )}
 
-            {selected.status === 'pending' && (
+            {selected.status === 'pending' ? (
               <div className="pd-actions">
                 <button className="btn btn-success" onClick={() => handleApprove(selected.id)}><CheckCircle size={16} /> Approve</button>
                 <button className="btn btn-danger" onClick={() => handleReject(selected.id)}><XCircle size={16} /> Reject</button>
+              </div>
+            ) : (
+              <div className="pd-actions" style={{marginTop: 16}}>
+                <button className="btn btn-outline" style={{borderColor:'var(--error)',color:'var(--error)',width:'100%'}} onClick={() => handleDelete(selected.id)}>
+                  <Trash2 size={16} /> Permanently Delete Property
+                </button>
               </div>
             )}
           </div>
