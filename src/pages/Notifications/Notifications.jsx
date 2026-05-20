@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send, Bell, Smartphone, CheckCircle } from 'lucide-react';
+import { Send, Bell, Smartphone, CheckCircle, Sparkles } from 'lucide-react';
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 
@@ -7,6 +7,10 @@ export default function Notifications() {
   const [form, setForm] = useState({ title: '', body: '', type: 'system' });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAiInput, setShowAiInput] = useState(false);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -21,6 +25,22 @@ export default function Notifications() {
     } catch(e) { toast.error('Failed to send'); } finally { setLoading(false); }
   };
 
+  const handleGenerateAI = async () => {
+    if (!aiPrompt) return toast.error('Enter a topic for the AI');
+    setAiLoading(true);
+    try {
+      const res = await adminAPI.generateAI({ prompt: aiPrompt, tone: 'professional', type: form.type });
+      setForm(prev => ({ ...prev, title: res.data.title, body: res.data.body }));
+      toast.success('AI Generated successfully!');
+      setShowAiInput(false);
+      setAiPrompt('');
+    } catch (e) {
+      toast.error('AI Generation failed');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <div>
       <h1 className="page-title">Push Notifications</h1>
@@ -29,7 +49,25 @@ export default function Notifications() {
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,maxWidth:900}}>
         {/* Send Form */}
         <div className="card">
-          <h3 style={{marginBottom:20,display:'flex',alignItems:'center',gap:8}}><Bell size={18} style={{color:'var(--primary)'}} /> Compose Broadcast</h3>
+          <div style={{marginBottom:20,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <h3 style={{display:'flex',alignItems:'center',gap:8,margin:0}}><Bell size={18} style={{color:'var(--primary)'}} /> Compose Broadcast</h3>
+            <button className="btn btn-sm btn-outline" onClick={() => setShowAiInput(!showAiInput)} style={{color:'var(--primary)',borderColor:'var(--primary-light)'}}>
+              <Sparkles size={14} /> AI Assist
+            </button>
+          </div>
+
+          {showAiInput && (
+            <div style={{marginBottom:20,padding:16,background:'rgba(37,99,235,0.05)',borderRadius:'var(--radius-sm)',border:'1px dashed var(--primary-light)'}}>
+              <div style={{fontSize:12,fontWeight:600,color:'var(--primary)',marginBottom:8}}>Generate with AI</div>
+              <div style={{display:'flex',gap:8}}>
+                <input className="input" style={{flex:1}} placeholder="e.g. 50% discount on summer houses" value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleGenerateAI()} />
+                <button className="btn btn-primary" onClick={handleGenerateAI} disabled={aiLoading}>
+                  {aiLoading ? <div className="spinner" style={{width:14,height:14}} /> : 'Generate'}
+                </button>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSend} style={{display:'flex',flexDirection:'column',gap:16}}>
             <div className="form-group">
               <label className="form-label">Title *</label>

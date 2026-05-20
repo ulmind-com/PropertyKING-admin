@@ -28,6 +28,7 @@ export const adminAPI = {
   users: (params) => api.get('/admin/users', { params }),
   toggleUserStatus: (id) => api.put(`/admin/users/${id}/status`),
   broadcast: (data) => api.post('/admin/notifications/broadcast', data),
+  generateAI: (data) => api.post('/admin/notifications/generate', data),
 };
 
 export const propertyTypeAPI = {
