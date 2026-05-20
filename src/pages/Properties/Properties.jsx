@@ -148,12 +148,13 @@ export default function Properties({ reviewMode }) {
                   <td style={{fontSize:12,color:'var(--text-muted)'}}>{timeAgo(p.created_at)}</td>
                   <td onClick={e => e.stopPropagation()}>
                     <div className="action-btns">
-                      {p.status === 'pending' ? (
-                        <>
-                          <button className="btn btn-sm btn-success" onClick={() => handleApprove(p.id)} title="Approve"><CheckCircle size={14} /></button>
-                          <button className="btn btn-sm btn-danger" onClick={() => handleReject(p.id)} title="Reject"><XCircle size={14} /></button>
-                        </>
-                      ) : (
+                      {(p.status === 'pending' || p.status === 'rejected') && (
+                        <button className="btn btn-sm btn-success" onClick={() => handleApprove(p.id)} title="Approve"><CheckCircle size={14} /></button>
+                      )}
+                      {p.status === 'pending' && (
+                        <button className="btn btn-sm btn-danger" onClick={() => handleReject(p.id)} title="Reject"><XCircle size={14} /></button>
+                      )}
+                      {p.status !== 'pending' && (
                         <button className="btn btn-sm btn-outline" style={{borderColor:'var(--error)',color:'var(--error)'}} onClick={() => handleDelete(p.id)} title="Delete Property">
                           <Trash2 size={14} />
                         </button>
@@ -320,18 +321,19 @@ export default function Properties({ reviewMode }) {
             )}
 
             {/* Actions */}
-            {selected.status === 'pending' ? (
-              <div className="pd-actions">
+            <div className="pd-actions">
+              {(selected.status === 'pending' || selected.status === 'rejected') && (
                 <button className="btn btn-success" onClick={() => handleApprove(selected.id)}><CheckCircle size={16} /> Approve</button>
+              )}
+              {selected.status === 'pending' && (
                 <button className="btn btn-danger" onClick={() => handleReject(selected.id)}><XCircle size={16} /> Reject</button>
-              </div>
-            ) : (
-              <div className="pd-actions" style={{marginTop: 16}}>
-                <button className="btn btn-outline" style={{borderColor:'var(--error)',color:'var(--error)',width:'100%'}} onClick={() => handleDelete(selected.id)}>
-                  <Trash2 size={16} /> Permanently Delete Property
+              )}
+              {selected.status !== 'pending' && (
+                <button className="btn btn-outline" style={{borderColor:'var(--error)',color:'var(--error)'}} onClick={() => handleDelete(selected.id)}>
+                  <Trash2 size={16} /> Delete
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
       </Drawer>
