@@ -106,9 +106,16 @@ export default function UsersPage() {
                   </td>
                   <td style={{fontSize:12,color:'var(--text-muted)'}}>{u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
                   <td onClick={e => e.stopPropagation()}>
-                    <button className={`btn btn-sm ${u.is_active ? 'btn-outline' : 'btn-success'}`} onClick={() => toggleStatus(u.id)} title={u.is_active ? 'Deactivate' : 'Activate'}>
-                      {u.is_active ? <UserX size={13} /> : <UserCheck size={13} />}
-                    </button>
+                    <div style={{display:'flex',gap:6}}>
+                      {u.role !== 'admin' && (
+                        <button className="btn btn-sm btn-outline" style={{borderColor:'var(--primary-light)',color:'var(--primary)',padding:'0 6px'}} onClick={() => makeAdmin(u.id)} title="Make Admin">
+                          <Shield size={13} />
+                        </button>
+                      )}
+                      <button className={`btn btn-sm ${u.is_active ? 'btn-outline' : 'btn-success'}`} style={{padding:'0 6px'}} onClick={() => toggleStatus(u.id)} title={u.is_active ? 'Deactivate' : 'Activate'}>
+                        {u.is_active ? <UserX size={13} /> : <UserCheck size={13} />}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
