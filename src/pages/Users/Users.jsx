@@ -23,7 +23,7 @@ export default function UsersPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const params = { page, limit: 20 };
+      const params = { page, limit: 10 };
       if (roleFilter) params.role = roleFilter;
       if (search) params.search = search;
       const res = await adminAPI.users(params);

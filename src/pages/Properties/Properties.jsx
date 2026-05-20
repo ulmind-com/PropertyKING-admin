@@ -34,7 +34,7 @@ export default function Properties({ reviewMode }) {
   const load = async () => {
     setLoading(true);
     try {
-      const params = { page, limit: 20 };
+      const params = { page, limit: 10 };
       if (statusFilter) params.status = statusFilter;
       if (search) params.search = search;
       const res = await adminAPI.properties(params);

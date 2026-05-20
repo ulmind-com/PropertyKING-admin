@@ -24,8 +24,8 @@ function App() {
         <Route path="/login" element={<AdminLogin />} />
         <Route path="/" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
-          <Route path="properties" element={<Properties />} />
-          <Route path="review-queue" element={<Properties reviewMode />} />
+          <Route path="properties" element={<Properties key="properties" />} />
+          <Route path="review-queue" element={<Properties key="review" reviewMode />} />
           <Route path="property-types" element={<PropertyTypes />} />
           <Route path="amenities" element={<Amenities />} />
           <Route path="users" element={<UsersPage />} />

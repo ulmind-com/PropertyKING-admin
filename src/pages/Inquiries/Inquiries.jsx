@@ -32,7 +32,7 @@ export default function Inquiries() {
   const load = async () => {
     setLoading(true);
     try {
-      const params = { page, limit: 20 };
+      const params = { page, limit: 10 };
       if (statusFilter) params.status = statusFilter;
       // Use admin properties endpoint to get all inquiries indirectly
       // or use the received inquiries endpoint with admin token
