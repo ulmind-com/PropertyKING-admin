@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, Heart, MessageSquare, Trash2, Bed, Bath, Maximize2, Building2, Car, Mail, Phone, Video, FileImage } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, Heart, MessageSquare, Trash2, Bed, Bath, Maximize2, Building2, Car, Mail, Phone, Video, FileImage, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 import Drawer from '../../components/Drawer/Drawer';
@@ -32,6 +32,7 @@ export default function Properties({ reviewMode }) {
   const [actionModal, setActionModal] = useState({ isOpen: false, type: '', id: null });
   const [actionReason, setActionReason] = useState('');
   const [imgIndex, setImgIndex] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
 
   useEffect(() => { load(); }, [page, statusFilter]);
 
@@ -174,7 +175,7 @@ export default function Properties({ reviewMode }) {
             {/* Image Gallery */}
             {selected.images && selected.images.length > 0 && (
               <div className="pd-gallery">
-                <img src={selected.images[imgIndex] || selected.image} alt="" className="pd-image" />
+                <img src={selected.images[imgIndex] || selected.image} alt="" className="pd-image pd-image-clickable" onClick={() => setLightbox(true)} />
                 {selected.images.length > 1 && (
                   <div className="pd-thumbs">
                     {selected.images.map((img, i) => (
@@ -184,7 +185,7 @@ export default function Properties({ reviewMode }) {
                 )}
               </div>
             )}
-            {!selected.images?.length && selected.image && <img src={selected.image} alt="" className="pd-image" />}
+            {!selected.images?.length && selected.image && <img src={selected.image} alt="" className="pd-image pd-image-clickable" onClick={() => setLightbox(true)} />}
 
             {/* Title & Status */}
             <h3 className="pd-title">{selected.title}</h3>
@@ -356,6 +357,24 @@ export default function Properties({ reviewMode }) {
           </div>
         </div>
       </Modal>
+
+      {/* Lightbox */}
+      {lightbox && selected && (() => {
+        const imgs = selected.images?.length ? selected.images : (selected.image ? [selected.image] : []);
+        return (
+          <div className="lightbox-overlay" onClick={() => setLightbox(false)}>
+            <button className="lightbox-close" onClick={() => setLightbox(false)}><X size={24} /></button>
+            <img src={imgs[imgIndex]} alt="" className="lightbox-img" onClick={e => e.stopPropagation()} />
+            {imgs.length > 1 && (
+              <>
+                <button className="lightbox-nav lightbox-prev" onClick={e => { e.stopPropagation(); setImgIndex((imgIndex - 1 + imgs.length) % imgs.length); }}><ChevronLeft size={32} /></button>
+                <button className="lightbox-nav lightbox-next" onClick={e => { e.stopPropagation(); setImgIndex((imgIndex + 1) % imgs.length); }}><ChevronRight size={32} /></button>
+              </>
+            )}
+            <div className="lightbox-counter">{imgIndex + 1} / {imgs.length}</div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
