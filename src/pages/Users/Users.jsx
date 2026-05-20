@@ -48,6 +48,16 @@ export default function UsersPage() {
     } catch(e) { toast.error('Failed'); }
   };
 
+  const makeAdmin = async (id) => {
+    if (!window.confirm("Are you sure you want to make this user an Admin?")) return;
+    try {
+      const res = await adminAPI.makeAdmin(id);
+      toast.success(res.data.message);
+      load();
+      if (selected?.id === id) setSelected({ ...selected, role: res.data.role });
+    } catch(e) { toast.error(e.response?.data?.detail || 'Failed'); }
+  };
+
   return (
     <div>
       <h1 className="page-title">Users</h1>
@@ -59,7 +69,7 @@ export default function UsersPage() {
           <input placeholder="Search by name or email..." value={search} onChange={e => handleSearch(e.target.value)} />
         </div>
         <div className="toolbar-filters">
-          {['', 'user', 'lister', 'admin'].map(r => (
+          {['', 'user', 'admin'].map(r => (
             <button key={r} className={`btn btn-sm ${roleFilter === r ? 'btn-primary' : 'btn-outline'}`} onClick={() => { setRoleFilter(r); setPage(1); }}>{r || 'All'}</button>
           ))}
         </div>
@@ -140,9 +150,16 @@ export default function UsersPage() {
                 <span className={`status-dot ${selected.is_active ? 'online' : 'offline'}`} />
                 <span style={{fontSize:13,fontWeight:600}}>{selected.is_active ? 'Active' : 'Disabled'}</span>
               </div>
-              <button className={`btn btn-sm ${selected.is_active ? 'btn-outline' : 'btn-success'}`} onClick={() => toggleStatus(selected.id)}>
-                {selected.is_active ? <><UserX size={13} /> Deactivate</> : <><UserCheck size={13} /> Activate</>}
-              </button>
+              <div style={{display:'flex',gap:8}}>
+                {selected.role !== 'admin' && (
+                  <button className="btn btn-sm btn-outline" style={{borderColor:'var(--primary-light)',color:'var(--primary)'}} onClick={() => makeAdmin(selected.id)}>
+                    <Shield size={13} /> Make Admin
+                  </button>
+                )}
+                <button className={`btn btn-sm ${selected.is_active ? 'btn-outline' : 'btn-success'}`} onClick={() => toggleStatus(selected.id)}>
+                  {selected.is_active ? <><UserX size={13} /> Deactivate</> : <><UserCheck size={13} /> Activate</>}
+                </button>
+              </div>
             </div>
           </div>
         )}

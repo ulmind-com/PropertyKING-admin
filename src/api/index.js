@@ -27,6 +27,7 @@ export const adminAPI = {
   rejectProperty: (id, reason) => api.put(`/admin/properties/${id}/reject`, { reason }),
   users: (params) => api.get('/admin/users', { params }),
   toggleUserStatus: (id) => api.put(`/admin/users/${id}/status`),
+  makeAdmin: (id) => api.put(`/admin/users/${id}/make-admin`),
   broadcast: (data) => api.post('/admin/notifications/broadcast', data),
   generateAI: (data) => api.post('/admin/notifications/generate', data),
 };
