@@ -7,7 +7,9 @@ import Properties from './pages/Properties/Properties';
 import PropertyTypes from './pages/PropertyTypes/PropertyTypes';
 import Amenities from './pages/Amenities/Amenities';
 import UsersPage from './pages/Users/Users';
+import Inquiries from './pages/Inquiries/Inquiries';
 import Notifications from './pages/Notifications/Notifications';
+import SettingsPage from './pages/Settings/Settings';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -23,11 +25,13 @@ function App() {
         <Route path="/" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="properties" element={<Properties />} />
-          <Route path="review-queue" element={<Properties />} />
+          <Route path="review-queue" element={<Properties reviewMode />} />
           <Route path="property-types" element={<PropertyTypes />} />
           <Route path="amenities" element={<Amenities />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="inquiries" element={<Inquiries />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
       <Toaster position="top-right" toastOptions={{ duration: 3000, style: { background: '#1A2035', color: '#F1F5F9', borderRadius: '10px', fontSize: '13px', fontWeight: 500, border: '1px solid rgba(255,255,255,0.06)' } }} />

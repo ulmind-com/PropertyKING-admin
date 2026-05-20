@@ -1,5 +1,6 @@
 .admin-layout { display: flex; min-height: 100vh; }
 
+/* ─── Sidebar ─── */
 .sidebar { width: var(--sidebar-width); background: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.25s ease; }
 .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border-light); }
 .sidebar-logo { display: flex; align-items: center; gap: 10px; font-size: 18px; }
@@ -8,28 +9,32 @@
 .sidebar-close { display: none; background: none; color: var(--text-muted); }
 
 .sidebar-nav { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
-.sidebar-link { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; color: var(--text-secondary); transition: all var(--transition); }
+.sidebar-link { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; color: var(--text-secondary); transition: all var(--transition); border-left: 3px solid transparent; }
 .sidebar-link:hover { background: var(--bg-elevated); color: var(--text); }
-.sidebar-link.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
-.sidebar-link.logout { color: var(--error); }
+.sidebar-link.active { background: var(--primary-light); color: var(--primary); font-weight: 600; border-left-color: var(--primary); box-shadow: inset 0 0 20px rgba(37,99,235,0.05); }
+.sidebar-link.logout { color: var(--error); border-left-color: transparent; }
 .sidebar-link.logout:hover { background: var(--error-light); }
 
 .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-light); }
 .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 10px 0; margin-bottom: 8px; }
-.su-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+.su-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px rgba(37,99,235,0.3); }
 .su-name { font-size: 13px; font-weight: 600; }
 .su-role { font-size: 11px; color: var(--text-muted); }
 
 .sidebar-overlay { display: none; }
 
+/* ─── Main ─── */
 .admin-main { flex: 1; margin-left: var(--sidebar-width); }
-.admin-header { height: var(--header-height); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; border-bottom: 1px solid var(--border-light); background: var(--bg-card); position: sticky; top: 0; z-index: 50; }
+.admin-header { height: var(--header-height); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; border-bottom: 1px solid var(--border-light); background: rgba(17,24,39,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; }
 .mobile-menu-btn { display: none; background: none; color: var(--text); }
 .header-right { display: flex; align-items: center; gap: 12px; }
-.header-env { padding: 4px 12px; background: var(--success-light); color: #34D399; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+.header-env { padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.env-prod { background: var(--success-light); color: #34D399; }
+.env-dev { background: var(--warning-light); color: #FBBF24; }
 
 .admin-content { padding: 28px; min-height: calc(100vh - var(--header-height)); }
 
+/* ─── Mobile ─── */
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
@@ -37,4 +42,5 @@
   .sidebar-overlay { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
   .admin-main { margin-left: 0; }
   .mobile-menu-btn { display: flex; }
+  .admin-content { padding: 16px; }
 }
