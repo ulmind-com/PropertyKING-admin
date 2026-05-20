@@ -252,21 +252,36 @@ export default function Properties({ reviewMode }) {
               </div>
             )}
 
-            {/* Floor Plan */}
-            {selected.floor_plan_url && (
-              <div className="pd-section">
-                <h4 className="pd-section-title"><FileImage size={14} style={{display:'inline',marginRight:6}} />Floor Plan</h4>
-                <img src={selected.floor_plan_url} alt="Floor Plan" className="pd-floor-plan" />
-              </div>
-            )}
+            {/* Floor Plans */}
+            {(() => {
+              const plans = selected.floor_plan_urls?.length ? selected.floor_plan_urls : (selected.floor_plan_url ? [selected.floor_plan_url] : []);
+              return plans.length > 0 && (
+                <div className="pd-section">
+                  <h4 className="pd-section-title"><FileImage size={14} style={{display:'inline',marginRight:6}} />Floor Plans ({plans.length})</h4>
+                  <div className="pd-floor-plans">
+                    {plans.map((url, i) => (
+                      <img key={i} src={url} alt={`Floor Plan ${i+1}`} className="pd-floor-plan" onClick={() => window.open(url, '_blank')} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Video Tour */}
-            {selected.video_url && (
-              <div className="pd-section">
-                <h4 className="pd-section-title"><Video size={14} style={{display:'inline',marginRight:6}} />Video Tour</h4>
-                <video src={selected.video_url} controls className="pd-video" />
-              </div>
-            )}
+            {selected.video_url && (() => {
+              const url = selected.video_url;
+              const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+              return (
+                <div className="pd-section">
+                  <h4 className="pd-section-title"><Video size={14} style={{display:'inline',marginRight:6}} />Video Tour</h4>
+                  {ytMatch ? (
+                    <iframe src={`https://www.youtube.com/embed/${ytMatch[1]}`} className="pd-video" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="Property Video" />
+                  ) : (
+                    <video src={url} controls className="pd-video" />
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Lister Info */}
             <div className="pd-section">
