@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, UserCheck, UserX, Mail, Phone, Calendar, Building2, Shield } from 'lucide-react';
+import { Search, UserCheck, UserX, Mail, Phone, Calendar, Building2, Shield, ShieldOff } from 'lucide-react';
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 import Modal from '../../components/Modal/Modal';
@@ -48,10 +48,11 @@ export default function UsersPage() {
     } catch(e) { toast.error('Failed'); }
   };
 
-  const makeAdmin = async (id) => {
-    if (!window.confirm("Are you sure you want to make this user an Admin?")) return;
+  const toggleAdmin = async (id, currentRole) => {
+    const isMakingAdmin = currentRole !== 'admin';
+    if (!window.confirm(`Are you sure you want to ${isMakingAdmin ? 'make this user an Admin' : 'revoke Admin rights from this user'}?`)) return;
     try {
-      const res = await adminAPI.makeAdmin(id);
+      const res = await adminAPI.toggleAdmin(id);
       toast.success(res.data.message);
       load();
       if (selected?.id === id) setSelected({ ...selected, role: res.data.role });
@@ -107,11 +108,14 @@ export default function UsersPage() {
                   <td style={{fontSize:12,color:'var(--text-muted)'}}>{u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
                   <td onClick={e => e.stopPropagation()}>
                     <div style={{display:'flex',gap:6}}>
-                      {u.role !== 'admin' && (
-                        <button className="btn btn-sm btn-outline" style={{borderColor:'var(--primary-light)',color:'var(--primary)',padding:'0 6px'}} onClick={() => makeAdmin(u.id)} title="Make Admin">
-                          <Shield size={13} />
-                        </button>
-                      )}
+                      <button 
+                        className={`btn btn-sm ${u.role === 'admin' ? 'btn-error' : 'btn-outline'}`} 
+                        style={u.role !== 'admin' ? {borderColor:'var(--primary-light)',color:'var(--primary)',padding:'0 6px'} : {padding:'0 6px'}} 
+                        onClick={() => toggleAdmin(u.id, u.role)} 
+                        title={u.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
+                      >
+                        {u.role === 'admin' ? <ShieldOff size={13} /> : <Shield size={13} />}
+                      </button>
                       <button className={`btn btn-sm ${u.is_active ? 'btn-outline' : 'btn-success'}`} style={{padding:'0 6px'}} onClick={() => toggleStatus(u.id)} title={u.is_active ? 'Deactivate' : 'Activate'}>
                         {u.is_active ? <UserX size={13} /> : <UserCheck size={13} />}
                       </button>
@@ -158,11 +162,13 @@ export default function UsersPage() {
                 <span style={{fontSize:13,fontWeight:600}}>{selected.is_active ? 'Active' : 'Disabled'}</span>
               </div>
               <div style={{display:'flex',gap:8}}>
-                {selected.role !== 'admin' && (
-                  <button className="btn btn-sm btn-outline" style={{borderColor:'var(--primary-light)',color:'var(--primary)'}} onClick={() => makeAdmin(selected.id)}>
-                    <Shield size={13} /> Make Admin
-                  </button>
-                )}
+                <button 
+                  className={`btn btn-sm ${selected.role === 'admin' ? 'btn-error' : 'btn-outline'}`} 
+                  style={selected.role !== 'admin' ? {borderColor:'var(--primary-light)',color:'var(--primary)'} : {}} 
+                  onClick={() => toggleAdmin(selected.id, selected.role)}
+                >
+                  {selected.role === 'admin' ? <><ShieldOff size={13} /> Revoke Admin</> : <><Shield size={13} /> Make Admin</>}
+                </button>
                 <button className={`btn btn-sm ${selected.is_active ? 'btn-outline' : 'btn-success'}`} onClick={() => toggleStatus(selected.id)}>
                   {selected.is_active ? <><UserX size={13} /> Deactivate</> : <><UserCheck size={13} /> Activate</>}
                 </button>
