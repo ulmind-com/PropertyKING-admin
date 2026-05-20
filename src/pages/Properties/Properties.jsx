@@ -3,6 +3,7 @@ import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, 
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 import Drawer from '../../components/Drawer/Drawer';
+import Modal from '../../components/Modal/Modal';
 import Pagination from '../../components/Pagination/Pagination';
 import EmptyState from '../../components/EmptyState/EmptyState';
 import { SkeletonTable } from '../../components/Skeleton/Skeleton';
@@ -28,6 +29,8 @@ export default function Properties({ reviewMode }) {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [actionModal, setActionModal] = useState({ isOpen: false, type: '', id: null });
+  const [actionReason, setActionReason] = useState('');
 
   useEffect(() => { load(); }, [page, statusFilter]);
 
@@ -51,17 +54,33 @@ export default function Properties({ reviewMode }) {
     try { await adminAPI.approveProperty(id); toast.success('Property approved!'); load(); setDrawerOpen(false); } catch(e) { toast.error('Failed to approve'); }
   };
 
-  const handleReject = async (id) => {
-    const reason = prompt('Rejection reason (min 10 chars):');
-    if (!reason || reason.length < 10) return toast.error('Reason must be at least 10 characters');
-    try { await adminAPI.rejectProperty(id, reason); toast.success('Property rejected'); load(); setDrawerOpen(false); } catch(e) { toast.error('Failed to reject'); }
+  const handleReject = (id) => {
+    setActionReason('');
+    setActionModal({ isOpen: true, type: 'reject', id });
   };
 
-  const handleDelete = async (id) => {
-    const reason = prompt('Please enter a reason for deletion (This will be emailed to the lister):');
-    if (!reason || reason.length < 10) return toast.error('Reason must be at least 10 characters');
-    if (!window.confirm('Are you sure you want to permanently delete this property?')) return;
-    try { await adminAPI.deleteProperty(id, reason); toast.success('Property deleted permanently'); load(); setDrawerOpen(false); } catch(e) { toast.error('Failed to delete property'); }
+  const handleDelete = (id) => {
+    setActionReason('');
+    setActionModal({ isOpen: true, type: 'delete', id });
+  };
+
+  const handleActionSubmit = async () => {
+    if (actionReason.length < 10) return toast.error('Reason must be at least 10 characters');
+    const { type, id } = actionModal;
+    try {
+      if (type === 'reject') {
+        await adminAPI.rejectProperty(id, actionReason);
+        toast.success('Property rejected');
+      } else {
+        await adminAPI.deleteProperty(id, actionReason);
+        toast.success('Property deleted permanently');
+      }
+      load();
+      setDrawerOpen(false);
+      setActionModal({ isOpen: false, type: '', id: null });
+    } catch (e) {
+      toast.error(`Failed to ${type} property`);
+    }
   };
 
   const openDrawer = (p) => { setSelected(p); setDrawerOpen(true); };
@@ -195,6 +214,28 @@ export default function Properties({ reviewMode }) {
           </div>
         )}
       </Drawer>
+
+      {/* Action Reason Modal */}
+      <Modal isOpen={actionModal.isOpen} onClose={() => setActionModal({ isOpen: false, type: '', id: null })} title={actionModal.type === 'reject' ? 'Reject Property' : 'Delete Property'}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>
+            {actionModal.type === 'reject' 
+              ? 'Please provide a reason for rejecting this property. This will be sent to the lister. (Min 10 chars)' 
+              : 'Please enter a reason for permanently deleting this property. This will be emailed to the lister. (Min 10 chars)'}
+          </p>
+          <textarea
+            className="input"
+            rows={4}
+            placeholder="Enter reason..."
+            value={actionReason}
+            onChange={(e) => setActionReason(e.target.value)}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
+            <button className="btn btn-outline" onClick={() => setActionModal({ isOpen: false, type: '', id: null })}>Cancel</button>
+            <button className="btn btn-danger" onClick={handleActionSubmit}>{actionModal.type === 'reject' ? 'Reject Property' : 'Delete Property'}</button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
