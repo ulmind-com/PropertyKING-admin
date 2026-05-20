@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, Heart, MessageSquare, Trash2, Bed, Bath, Maximize2, Building2, Car, Mail, Phone } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, Heart, MessageSquare, Trash2, Bed, Bath, Maximize2, Building2, Car, Mail, Phone, Video, FileImage } from 'lucide-react';
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 import Drawer from '../../components/Drawer/Drawer';
@@ -249,6 +249,22 @@ export default function Properties({ reviewMode }) {
                 <a href={`https://www.google.com/maps?q=${selected.latitude},${selected.longitude}`} target="_blank" rel="noopener noreferrer" className="pd-map-link">
                   <MapPin size={14} /> Open in Google Maps ↗
                 </a>
+              </div>
+            )}
+
+            {/* Floor Plan */}
+            {selected.floor_plan_url && (
+              <div className="pd-section">
+                <h4 className="pd-section-title"><FileImage size={14} style={{display:'inline',marginRight:6}} />Floor Plan</h4>
+                <img src={selected.floor_plan_url} alt="Floor Plan" className="pd-floor-plan" />
+              </div>
+            )}
+
+            {/* Video Tour */}
+            {selected.video_url && (
+              <div className="pd-section">
+                <h4 className="pd-section-title"><Video size={14} style={{display:'inline',marginRight:6}} />Video Tour</h4>
+                <video src={selected.video_url} controls className="pd-video" />
               </div>
             )}
 
