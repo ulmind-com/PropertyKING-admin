@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, Heart, MessageSquare, Trash2 } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Eye, MapPin, Calendar, User, DollarSign, Heart, MessageSquare, Trash2, Bed, Bath, Maximize2, Building2, Car, Mail, Phone } from 'lucide-react';
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 import Drawer from '../../components/Drawer/Drawer';
@@ -31,6 +31,7 @@ export default function Properties({ reviewMode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [actionModal, setActionModal] = useState({ isOpen: false, type: '', id: null });
   const [actionReason, setActionReason] = useState('');
+  const [imgIndex, setImgIndex] = useState(0);
 
   useEffect(() => { load(); }, [page, statusFilter]);
 
@@ -83,7 +84,7 @@ export default function Properties({ reviewMode }) {
     }
   };
 
-  const openDrawer = (p) => { setSelected(p); setDrawerOpen(true); };
+  const openDrawer = (p) => { setSelected(p); setImgIndex(0); setDrawerOpen(true); };
 
   const statusColors = { active: 'badge-success', pending: 'badge-warning', rejected: 'badge-error', sold: 'badge-info', rented: 'badge-info', expired: 'badge-error', draft: 'badge-info' };
 
@@ -167,31 +168,118 @@ export default function Properties({ reviewMode }) {
 
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
-      {/* Property Detail Drawer */}
-      <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title="Property Details" width={520}>
+      <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title="Property Details" width={560}>
         {selected && (
           <div className="prop-detail">
-            {selected.image && <img src={selected.image} alt="" className="pd-image" />}
-            <h3 className="pd-title">{selected.title}</h3>
-            <span className={`badge ${statusColors[selected.status]}`} style={{marginBottom:16}}>{selected.status}</span>
+            {/* Image Gallery */}
+            {selected.images && selected.images.length > 0 && (
+              <div className="pd-gallery">
+                <img src={selected.images[imgIndex] || selected.image} alt="" className="pd-image" />
+                {selected.images.length > 1 && (
+                  <div className="pd-thumbs">
+                    {selected.images.map((img, i) => (
+                      <img key={i} src={img} alt="" className={`pd-thumb ${i === imgIndex ? 'pd-thumb-active' : ''}`} onClick={() => setImgIndex(i)} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {!selected.images?.length && selected.image && <img src={selected.image} alt="" className="pd-image" />}
 
-            <div className="pd-grid">
-              <div className="pd-item"><DollarSign size={14} /><span>Price</span><strong>${selected.price?.toLocaleString()}</strong></div>
-              <div className="pd-item"><MapPin size={14} /><span>Location</span><strong>{selected.city}{selected.state ? `, ${selected.state}` : ''}</strong></div>
-              <div className="pd-item"><User size={14} /><span>Lister</span><strong>{selected.lister_name || '—'}</strong></div>
-              <div className="pd-item"><Calendar size={14} /><span>Listed</span><strong>{timeAgo(selected.created_at)}</strong></div>
+            {/* Title & Status */}
+            <h3 className="pd-title">{selected.title}</h3>
+            <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:12,flexWrap:'wrap'}}>
+              <span className={`badge ${statusColors[selected.status]}`}>{selected.status}</span>
+              {selected.property_type && <span className="badge badge-info">{selected.property_type}</span>}
+              {selected.listing_type && <span className="badge badge-info" style={{textTransform:'capitalize'}}>{selected.listing_type}</span>}
             </div>
 
-            {selected.lister_email && (
-              <div style={{fontSize:12,color:'var(--text-muted)',marginTop:8}}>Email: {selected.lister_email}</div>
+            {/* Description */}
+            {selected.description && (
+              <div className="pd-section">
+                <h4 className="pd-section-title">Description</h4>
+                <p className="pd-desc">{selected.description}</p>
+              </div>
             )}
 
+            {/* Price & Location Grid */}
+            <div className="pd-grid">
+              <div className="pd-item"><DollarSign size={14} /><span>Price</span><strong>{selected.currency === 'INR' ? '₹' : '$'}{selected.price?.toLocaleString()}</strong></div>
+              <div className="pd-item"><MapPin size={14} /><span>Location</span><strong>{[selected.address, selected.city, selected.state, selected.zip_code].filter(Boolean).join(', ') || '—'}</strong></div>
+            </div>
+
+            {/* Property Specs */}
+            {(selected.bedrooms || selected.bathrooms || selected.area_sqft || selected.year_built) && (
+              <div className="pd-section">
+                <h4 className="pd-section-title">Property Details</h4>
+                <div className="pd-specs">
+                  {selected.bedrooms != null && <div className="pd-spec"><Bed size={16} /><span>{selected.bedrooms} Beds</span></div>}
+                  {selected.bathrooms != null && <div className="pd-spec"><Bath size={16} /><span>{selected.bathrooms} Baths</span></div>}
+                  {selected.area_sqft != null && <div className="pd-spec"><Maximize2 size={16} /><span>{selected.area_sqft.toLocaleString()} sqft</span></div>}
+                  {selected.year_built != null && <div className="pd-spec"><Calendar size={16} /><span>Built {selected.year_built}</span></div>}
+                  {selected.stories != null && <div className="pd-spec"><Building2 size={16} /><span>{selected.stories} Stories</span></div>}
+                  {selected.garage_spaces != null && selected.garage_spaces > 0 && <div className="pd-spec"><Car size={16} /><span>{selected.garage_spaces} Garage</span></div>}
+                </div>
+                {(selected.heating || selected.cooling) && (
+                  <div style={{display:'flex',gap:12,marginTop:8,fontSize:12,color:'var(--text-muted)'}}>
+                    {selected.heating && <span>🔥 Heating: {selected.heating}</span>}
+                    {selected.cooling && <span>❄️ Cooling: {selected.cooling}</span>}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Amenities */}
+            {selected.amenities && selected.amenities.length > 0 && (
+              <div className="pd-section">
+                <h4 className="pd-section-title">Amenities</h4>
+                <div className="pd-amenities">
+                  {selected.amenities.map((a, i) => {
+                    const name = typeof a === 'string' ? a : (a.name || a);
+                    return <span key={i} className="pd-amenity-tag">{name}</span>;
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Map Link */}
+            {selected.latitude && selected.longitude && (
+              <div className="pd-section">
+                <h4 className="pd-section-title">Map Location</h4>
+                <a href={`https://www.google.com/maps?q=${selected.latitude},${selected.longitude}`} target="_blank" rel="noopener noreferrer" className="pd-map-link">
+                  <MapPin size={14} /> Open in Google Maps ↗
+                </a>
+              </div>
+            )}
+
+            {/* Lister Info */}
+            <div className="pd-section">
+              <h4 className="pd-section-title">Lister Information</h4>
+              <div className="pd-lister">
+                {selected.lister_avatar ? <img src={selected.lister_avatar} alt="" className="pd-lister-avatar" /> 
+                  : <div className="pd-lister-avatar-placeholder">{(selected.lister_name || '?')[0]}</div>}
+                <div>
+                  <strong>{selected.lister_name || '—'}</strong>
+                  {selected.lister_email && <div className="pd-lister-contact"><Mail size={12} /> {selected.lister_email}</div>}
+                  {selected.lister_phone && <div className="pd-lister-contact"><Phone size={12} /> {selected.lister_phone}</div>}
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
             <div className="pd-stats">
               <div><Eye size={14} /><span>{selected.views || 0} views</span></div>
               <div><Heart size={14} /><span>{selected.favorites || 0} favs</span></div>
               <div><MessageSquare size={14} /><span>{selected.inquiries || 0} inquiries</span></div>
             </div>
 
+            {/* Timestamps */}
+            <div style={{fontSize:11,color:'var(--text-muted)',marginBottom:12}}>
+              <div>Created: {selected.created_at ? new Date(selected.created_at).toLocaleString() : '—'}</div>
+              {selected.listed_at && <div>Listed: {new Date(selected.listed_at).toLocaleString()}</div>}
+            </div>
+
+            {/* Rejection Reason */}
             {selected.admin_review?.rejection_reason && (
               <div className="pd-rejection">
                 <strong>Rejection Reason:</strong>
@@ -199,6 +287,7 @@ export default function Properties({ reviewMode }) {
               </div>
             )}
 
+            {/* Actions */}
             {selected.status === 'pending' ? (
               <div className="pd-actions">
                 <button className="btn btn-success" onClick={() => handleApprove(selected.id)}><CheckCircle size={16} /> Approve</button>
