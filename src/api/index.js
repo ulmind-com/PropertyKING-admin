@@ -22,6 +22,7 @@ export const authAPI = {
 export const adminAPI = {
   dashboard: () => api.get('/admin/dashboard'),
   properties: (params) => api.get('/admin/properties', { params }),
+  propertiesCount: (params) => api.get('/admin/properties/count', { params }),
   approveProperty: (id) => api.put(`/admin/properties/${id}/approve`),
   rejectProperty: (id, reason) => api.put(`/admin/properties/${id}/reject`, { reason }),
   users: (params) => api.get('/admin/users', { params }),

@@ -37,10 +37,13 @@ export default function Properties({ reviewMode }) {
       const params = { page, limit: 10 };
       if (statusFilter) params.status = statusFilter;
       if (search) params.search = search;
+      adminAPI.propertiesCount({ status: statusFilter, search }).then(countRes => {
+        setTotal(countRes.data.total);
+        setTotalPages(Math.ceil(countRes.data.total / 10));
+      }).catch(console.error);
+
       const res = await adminAPI.properties(params);
       setProperties(res.data.properties);
-      setTotal(res.data.total);
-      setTotalPages(res.data.total_pages);
     } catch(e) { console.error(e); } finally { setLoading(false); }
   };
 
