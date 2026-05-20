@@ -67,7 +67,7 @@ export default function Properties({ reviewMode }) {
   };
 
   const handleActionSubmit = async () => {
-    if (actionReason.length < 10) return toast.error('Reason must be at least 10 characters');
+    if (!actionReason.trim()) return toast.error('Please enter a reason');
     const { type, id } = actionModal;
     try {
       if (type === 'reject') {
@@ -341,8 +341,8 @@ export default function Properties({ reviewMode }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>
             {actionModal.type === 'reject' 
-              ? 'Please provide a reason for rejecting this property. This will be sent to the lister. (Min 10 chars)' 
-              : 'Please enter a reason for permanently deleting this property. This will be emailed to the lister. (Min 10 chars)'}
+              ? 'Please provide a reason for rejecting this property. This will be sent to the lister.' 
+              : 'Please enter a reason for permanently deleting this property. This will be emailed to the lister.'}
           </p>
           <textarea
             className="input"
