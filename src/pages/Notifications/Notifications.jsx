@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Send, Bell, Smartphone, CheckCircle, Sparkles } from 'lucide-react';
+import { Send, Bell, Smartphone, CheckCircle, Sparkles, Image } from 'lucide-react';
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 
 export default function Notifications() {
-  const [form, setForm] = useState({ title: '', body: '', type: 'system' });
+  const [form, setForm] = useState({ title: '', body: '', type: 'system', image_url: '' });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   
@@ -21,7 +21,7 @@ export default function Notifications() {
       toast.success(res.data.message);
       setSent(true);
       setTimeout(() => setSent(false), 3000);
-      setForm({ title: '', body: '', type: 'system' });
+      setForm({ title: '', body: '', type: 'system', image_url: '' });
     } catch(e) { toast.error('Failed to send'); } finally { setLoading(false); }
   };
 
@@ -88,6 +88,15 @@ export default function Notifications() {
                 <option value="promotion">Promotion</option>
               </select>
             </div>
+            <div className="form-group">
+              <label className="form-label"><Image size={14} style={{display:'inline',verticalAlign:'-2px',marginRight:4}} />Image URL (optional)</label>
+              <input className="input" value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})} placeholder="https://example.com/image.jpg" />
+              {form.image_url && (
+                <div style={{marginTop:8,borderRadius:8,overflow:'hidden',border:'1px solid var(--border)',maxHeight:120}}>
+                  <img src={form.image_url} alt="Preview" style={{width:'100%',maxHeight:120,objectFit:'cover'}} onError={e => e.target.style.display='none'} />
+                </div>
+              )}
+            </div>
             <button type="submit" className="btn btn-primary" disabled={loading} style={{padding:'12px'}}>
               {loading ? <div className="spinner" /> : sent ? <><CheckCircle size={16} /> Sent!</> : <><Send size={16} /> Send to All Users</>}
             </button>
@@ -105,11 +114,16 @@ export default function Notifications() {
                 </div>
                 <div style={{flex:1}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
-                    <span style={{fontSize:12,fontWeight:600}}>PropertyKING</span>
+                    <span style={{fontSize:12,fontWeight:600}}>PropertyKing</span>
                     <span style={{fontSize:10,color:'var(--text-muted)'}}>now</span>
                   </div>
                   <div style={{fontSize:13,fontWeight:600,marginBottom:2}}>{form.title || 'Notification Title'}</div>
                   <div style={{fontSize:12,color:'var(--text-secondary)',lineHeight:1.4}}>{form.body || 'Your message will appear here...'}</div>
+                  {form.image_url && (
+                    <div style={{marginTop:8,borderRadius:6,overflow:'hidden'}}>
+                      <img src={form.image_url} alt="" style={{width:'100%',maxHeight:100,objectFit:'cover',borderRadius:6}} onError={e => e.target.style.display='none'} />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
