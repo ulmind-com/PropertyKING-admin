@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Send, Bell, Smartphone, CheckCircle, Sparkles, Image } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Send, Bell, Smartphone, CheckCircle, Sparkles, Image, X, Upload } from 'lucide-react';
 import { adminAPI } from '../../api';
 import toast from 'react-hot-toast';
 
@@ -7,10 +7,28 @@ export default function Notifications() {
   const [form, setForm] = useState({ title: '', body: '', type: 'system', image_url: '' });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [uploading, setUploading] = useState(false);
   
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [showAiInput, setShowAiInput] = useState(false);
+  const fileRef = useRef(null);
+
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return toast.error('Please select an image file');
+    if (file.size > 5 * 1024 * 1024) return toast.error('Image must be under 5MB');
+    setUploading(true);
+    try {
+      const res = await adminAPI.uploadImage(file);
+      setForm(prev => ({ ...prev, image_url: res.data.image.url }));
+      toast.success('Image uploaded!');
+    } catch (e) {
+      toast.error('Image upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -89,15 +107,28 @@ export default function Notifications() {
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label"><Image size={14} style={{display:'inline',verticalAlign:'-2px',marginRight:4}} />Image URL (optional)</label>
-              <input className="input" value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})} placeholder="https://example.com/image.jpg" />
-              {form.image_url && (
-                <div style={{marginTop:8,borderRadius:8,overflow:'hidden',border:'1px solid var(--border)',maxHeight:120}}>
-                  <img src={form.image_url} alt="Preview" style={{width:'100%',maxHeight:120,objectFit:'cover'}} onError={e => e.target.style.display='none'} />
+              <label className="form-label"><Image size={14} style={{display:'inline',verticalAlign:'-2px',marginRight:4}} />Attach Image (optional)</label>
+              <input type="file" ref={fileRef} accept="image/*" style={{display:'none'}} onChange={e => { handleImageUpload(e.target.files[0]); e.target.value = ''; }} />
+              {form.image_url ? (
+                <div style={{position:'relative',borderRadius:8,overflow:'hidden',border:'1px solid var(--border)'}}>
+                  <img src={form.image_url} alt="Uploaded" style={{width:'100%',maxHeight:140,objectFit:'cover',display:'block'}} />
+                  <button type="button" onClick={() => setForm({...form, image_url: ''})} style={{position:'absolute',top:6,right:6,width:24,height:24,borderRadius:'50%',background:'rgba(0,0,0,0.6)',border:'none',color:'#fff',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    <X size={14} />
+                  </button>
                 </div>
+              ) : (
+                <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+                  style={{width:'100%',padding:'20px 16px',borderRadius:'var(--radius-sm)',border:'2px dashed var(--border)',background:'var(--bg-elevated)',color:'var(--text-muted)',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:8,fontSize:13,transition:'border-color 0.2s'}}
+                  onMouseEnter={e => e.currentTarget.style.borderColor='var(--primary-light)'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor='var(--border)'}
+                >
+                  {uploading ? <div className="spinner" style={{width:20,height:20}} /> : <Upload size={20} />}
+                  {uploading ? 'Uploading...' : 'Click to upload image'}
+                  <span style={{fontSize:11,color:'var(--text-muted)'}}>JPG, PNG up to 5MB</span>
+                </button>
               )}
             </div>
-            <button type="submit" className="btn btn-primary" disabled={loading} style={{padding:'12px'}}>
+            <button type="submit" className="btn btn-primary" disabled={loading || uploading} style={{padding:'12px'}}>
               {loading ? <div className="spinner" /> : sent ? <><CheckCircle size={16} /> Sent!</> : <><Send size={16} /> Send to All Users</>}
             </button>
           </form>
@@ -121,7 +152,7 @@ export default function Notifications() {
                   <div style={{fontSize:12,color:'var(--text-secondary)',lineHeight:1.4}}>{form.body || 'Your message will appear here...'}</div>
                   {form.image_url && (
                     <div style={{marginTop:8,borderRadius:6,overflow:'hidden'}}>
-                      <img src={form.image_url} alt="" style={{width:'100%',maxHeight:100,objectFit:'cover',borderRadius:6}} onError={e => e.target.style.display='none'} />
+                      <img src={form.image_url} alt="" style={{width:'100%',maxHeight:100,objectFit:'cover',borderRadius:6}} />
                     </div>
                   )}
                 </div>
@@ -135,6 +166,7 @@ export default function Notifications() {
               <li>Broadcasts are sent to all users with push notifications enabled</li>
               <li>Users receive notifications on their mobile devices via FCM</li>
               <li>Notifications are also saved in the in-app notification center</li>
+              <li>Attached images appear as rich notifications on mobile</li>
             </ul>
           </div>
         </div>

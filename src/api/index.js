@@ -31,6 +31,11 @@ export const adminAPI = {
   toggleAdmin: (id) => api.put(`/admin/users/${id}/toggle-admin`),
   broadcast: (data) => api.post('/admin/notifications/broadcast', data),
   generateAI: (data) => api.post('/admin/notifications/generate', data),
+  uploadImage: (file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return api.post('/upload/image?folder=propertyking/notifications', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+  },
 };
 
 export const propertyTypeAPI = {
