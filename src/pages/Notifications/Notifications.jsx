@@ -97,15 +97,7 @@ export default function Notifications() {
               <textarea className="input" rows={4} value={form.body} onChange={e => setForm({...form, body: e.target.value})} placeholder="Write your message..." required maxLength={500} />
               <span style={{fontSize:11,color:'var(--text-muted)',textAlign:'right'}}>{form.body.length}/500</span>
             </div>
-            <div className="form-group">
-              <label className="form-label">Type</label>
-              <select className="input" value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
-                <option value="system">System Announcement</option>
-                <option value="new_listing">New Listing Alert</option>
-                <option value="price_drop">Price Drop</option>
-                <option value="promotion">Promotion</option>
-              </select>
-            </div>
+
             <div className="form-group">
               <label className="form-label"><Image size={14} style={{display:'inline',verticalAlign:'-2px',marginRight:4}} />Attach Image (optional)</label>
               <input type="file" ref={fileRef} accept="image/*" style={{display:'none'}} onChange={e => { handleImageUpload(e.target.files[0]); e.target.value = ''; }} />
